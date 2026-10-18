@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ref, get, set } from 'firebase/database';
 import { 
   signOut, 
@@ -393,9 +393,8 @@ const OnboardingWizard: React.FC<{
 const AdminDashboard: React.FC<{
   config: SiteConfig;
   setConfig: React.Dispatch<React.SetStateAction<SiteConfig>>;
-  setView: (v: 'public' | 'admin_dashboard') => void;
   currentUser: User;
-}> = ({ config, setConfig, setView, currentUser }) => {
+}> = ({ config, setConfig, currentUser }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'hero' | 'projects' | 'settings' | 'theme'>('hero');
   const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
@@ -1122,10 +1121,13 @@ const PublicPortfolio: React.FC = () => {
 
 const AppShell: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [config, setConfig] = useState<SiteConfig>(DEFAULT_CONFIG);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+
+  const shouldRenderPortfolioHeader = location.pathname === '/dashboard' || location.pathname.startsWith('/p/');
 
   const handleSetView = (nextView: 'public' | 'admin_dashboard') => {
     navigate(nextView === 'admin_dashboard' ? '/dashboard' : '/');
@@ -1191,13 +1193,15 @@ const AppShell: React.FC = () => {
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-violet-500/30 selection:text-white relative overflow-x-hidden">
       <BackgroundGlows themeColor={config.themeColor} />
 
-      <HeaderNavbar
-        authorName={config.authorName}
-        authorTitle={config.authorTitle}
-        onAdminClick={() => handleSetView(currentUser ? 'admin_dashboard' : 'public')}
-        currentUser={currentUser}
-        themeColor={config.themeColor}
-      />
+      {shouldRenderPortfolioHeader && (
+        <HeaderNavbar
+          authorName={config.authorName}
+          authorTitle={config.authorTitle}
+          onAdminClick={() => handleSetView(currentUser ? 'admin_dashboard' : 'public')}
+          currentUser={currentUser}
+          themeColor={config.themeColor}
+        />
+      )}
 
       <Routes>
         <Route
@@ -1228,7 +1232,6 @@ const AppShell: React.FC = () => {
                 <AdminDashboard
                   config={config}
                   setConfig={setConfig}
-                  setView={handleSetView}
                   currentUser={currentUser}
                 />
               )

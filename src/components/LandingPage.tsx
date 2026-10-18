@@ -114,7 +114,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onAuthSuccess }) => {
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <div>
-              <p className="text-base font-black tracking-tight text-white">PortfolioFlow</p>
+              <p className="text-base font-black tracking-tight text-white">Portfolio Craft</p>
             </div>
           </div>
 
