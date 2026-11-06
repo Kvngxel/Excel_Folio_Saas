@@ -112,6 +112,14 @@ interface SiteConfig {
   footerText: string;
 }
 
+const optimizeImageUrl = (url: string, width = 640) => {
+  if (!url || !url.includes('images.unsplash.com')) return url;
+
+  const cleanUrl = url.replace(/([?&])w=\d+/g, '');
+  const separator = cleanUrl.includes('?') ? '&' : '?';
+  return `${cleanUrl}${separator}w=${width}&q=80&fm=webp`;
+};
+
 const DEFAULT_CONFIG: SiteConfig = {
   username: '',
   themeColor: '#8b5cf6',
@@ -138,7 +146,7 @@ const DEFAULT_CONFIG: SiteConfig = {
       title: 'Aetheria Spatial Operating System',
       category: 'Spatial',
       description: 'A revolutionary visionOS design system tailored for immersive 3D gestures and ambient lighting responsive UI.',
-      imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+      imageUrl: optimizeImageUrl('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80', 640),
       stats: '+140% Engagement',
       featured: true
     },
@@ -147,7 +155,7 @@ const DEFAULT_CONFIG: SiteConfig = {
       title: 'Prism Neon Brand Identity',
       category: 'Branding',
       description: 'Dynamic identity with real-time generative vector logos adapting to user screen dimensions.',
-      imageUrl: 'https://images.unsplash.com/photo-1626785773579-c13f6ab88eb5?auto=format&fit=crop&w=800&q=80',
+      imageUrl: optimizeImageUrl('https://images.unsplash.com/photo-1626785773579-c13f6ab88eb5?auto=format&fit=crop&w=800&q=80', 640),
       stats: 'Global Rebrand'
     }
   ],
@@ -567,7 +575,14 @@ const AdminDashboard: React.FC<{
                         {config.projects.map(p => (
                           <div key={p.id} className="flex items-center justify-between p-4 bg-zinc-900/80 hover:bg-zinc-800/80 transition-colors rounded-2xl border border-zinc-800 group">
                             <div className="flex items-center gap-4">
-                              <img src={p.imageUrl} alt={p.title} className="w-14 h-14 rounded-xl object-cover border border-white/10 bg-zinc-950" onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=200&q=80' }} />
+                              <img
+                                src={optimizeImageUrl(p.imageUrl, 200)}
+                                alt={p.title}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-14 h-14 rounded-xl object-cover border border-white/10 bg-zinc-950"
+                                onError={(e) => { e.currentTarget.src = optimizeImageUrl('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=200&q=80', 200); }}
+                              />
                               <div>
                                 <div className="font-bold text-white text-sm md:text-base">{p.title}</div>
                                 <div className="text-xs text-zinc-400 mt-0.5">{p.category} • {p.stats}</div>
@@ -734,10 +749,14 @@ const VisualHero: React.FC<{ config: SiteConfig, onExploreClick: () => void }> =
 const PortfolioCard: React.FC<{ item: ProjectItem }> = ({ item }) => (
   <div className="group relative rounded-3xl overflow-hidden glass-card transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(139,92,246,0.25)] flex flex-col h-[420px] animate-fade-in">
     <img 
-      src={item.imageUrl} 
-      alt={item.title} 
+      src={optimizeImageUrl(item.imageUrl, 900)}
+      alt={item.title}
+      loading="lazy"
+      decoding="async"
+      width={900}
+      height={600}
       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-      onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80' }}
+      onError={(e) => { e.currentTarget.src = optimizeImageUrl('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80', 900); }}
     />
     <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
 
